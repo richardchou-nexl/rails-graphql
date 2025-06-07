@@ -74,3 +74,5 @@ gem "graphql", "~> 2.5"
 gem "graphiql-rails", "~> 1.10"
 
 gem "jwt", "~> 2.10"
+
+gem "faker", "~> 3.5"
