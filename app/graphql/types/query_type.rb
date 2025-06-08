@@ -3,19 +3,9 @@
 module Types
   class QueryType < Types::BaseObject
     # get all users
-    field :users, [ Types::UserType ], null: false
-
-    def users
-      User.all
-    end
+    field :users, resolver: Resolvers::UsersResolver
 
     # get a specific user by ID
-    field :user, Types::UserType, null: true do
-      argument :id, ID, required: true
-    end
-
-    def user(id:)
-      User.find(id)
-    end
+    field :user, resolver: Resolvers::UserResolver
   end
 end
