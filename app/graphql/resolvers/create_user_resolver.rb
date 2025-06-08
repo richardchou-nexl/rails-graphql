@@ -3,7 +3,8 @@ module Resolvers
     def self.call(args, context)
       user = User.new(
         email: args[:email],
-        name: args[:name]
+        name: args[:name],
+        password: args[:password]
       )
 
       if user.save
