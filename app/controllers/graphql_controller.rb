@@ -4,7 +4,7 @@ class GraphqlController < ApplicationController
   # If accessing from outside this domain, nullify the session
   # This allows for outside API access while preventing CSRF attacks,
   # but you'll have to authenticate your user separately
-  # protect_from_forgery with: :null_session
+  protect_from_forgery with: :null_session
 
   def execute
     variables = prepare_variables(params[:variables])
@@ -12,7 +12,7 @@ class GraphqlController < ApplicationController
     operation_name = params[:operationName]
     context = {
       # Query context goes here, for example:
-      # current_user: current_user,
+      current_user: current_user_from_token
     }
     result = RailsReactInterviewTemplateSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
@@ -47,6 +47,22 @@ class GraphqlController < ApplicationController
     logger.error e.message
     logger.error e.backtrace.join("\n")
 
-    render json: { errors: [{ message: e.message, backtrace: e.backtrace }], data: {} }, status: 500
+    render json: { errors: [ { message: e.message, backtrace: e.backtrace } ], data: {} }, status: 500
+  end
+
+  def current_user_from_token
+    token = request.headers["Authorization"]&.split(" ")&.last
+    return nil unless token
+
+    begin
+      # decoded_token = JWT.decode(token, Rails.application.secrets.secret_key_base, true, { algorithm: "HS256" })
+      #
+
+      decoded_token = JWT.decode(token, "my_secret_key", true, { algorithm: "HS256" })
+      user_id = decoded_token[0]["user_id"]
+      User.find(user_id)
+    rescue JWT::DecodeError, ActiveRecord::RecordNotFound
+      nil
+    end
   end
 end
