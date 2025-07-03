@@ -1,22 +1,24 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { todoProps } from "./helpers";
-import { useQuery, useMutation } from "@apollo/client";
+import React from "react";
+import { useQuery } from "@apollo/client";
 import { gql } from "../__generated__";
-import type { User } from "../__generated__/types";
+import { UserInfoFragment } from "../__generated__/types";
 
 const GET_USER = gql(`
-  query GetUser {
+  query GetUser($id: ID!) {
     users {
-      id
-      name
-      email
+      ...UserInfo
+    }
+
+    user(id: $id) {
+      ...UserInfo
     }
   }
 `);
 
 const TodosIndex = () => {
-  const { loading, error, data } = useQuery(GET_USER);
+  const { loading, error, data } = useQuery(GET_USER, {
+    variables: { id: "31" },
+  });
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -25,9 +27,10 @@ const TodosIndex = () => {
       <h2>ToDos React Component ⚛️</h2>
       <div>
         {
-          data?.users.map((user) => (
+          data?.users.map((user: UserInfoFragment) => (
             <div key={user.id} style={{ marginBottom: '10px' }}>
               <h3>{user.name}</h3>
+              <p>Id: {user.id}</p>
               <p>Email: {user.email}</p>
               <p>Name: {user.name}</p>
             </div>
