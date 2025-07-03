@@ -1,33 +1,25 @@
 import React from "react";
-import { useQuery } from "@apollo/client";
-import { gql } from "../__generated__";
-import { UserInfoFragment } from "../__generated__/types";
+import { gql, useQuery } from "@apollo/client";
+import { useGetUserLazyQuery, UserInfoFragment } from "../__generated__/types";
 
-const GET_USER = gql(`
-  query GetUser($id: ID!) {
-    users {
-      ...UserInfo
-    }
-
-    user(id: $id) {
-      ...UserInfo
-    }
-  }
-`);
 
 const TodosIndex = () => {
-  const { loading, error, data } = useQuery(GET_USER, {
-    variables: { id: "31" },
-  });
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  const [getUser, { loading, error, data }] = useGetUserLazyQuery();
 
+  const handleUserClick = (id: string) => {
+    getUser({ variables: { id } });
+  };
+  
   return (
     <div style={{ border: '1px solid red' }}>
-      <h2>ToDos React Component ⚛️</h2>
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error.message}</p>}
+      <button onClick={() => handleUserClick("31")}>Get Users</button>
       <div>
+        <h2>ToDos React Component ⚛️</h2>
         {
-          data?.users.map((user: UserInfoFragment) => (
+          data?.users &&
+          data.users.map((user: UserInfoFragment) => (
             <div key={user.id} style={{ marginBottom: '10px' }}>
               <h3>{user.name}</h3>
               <p>Id: {user.id}</p>
@@ -35,6 +27,16 @@ const TodosIndex = () => {
               <p>Name: {user.name}</p>
             </div>
           ))
+        }
+        {
+          data?.user && (
+            <div style={{ marginBottom: '10px' }}>
+              <h3>{data.user.name}</h3>
+              <p>Id: {data.user.id}</p>
+              <p>Email: {data.user.email}</p>
+              <p>Name: {data.user.name}</p>
+            </div>
+          )
         }
       </div>
     </div>

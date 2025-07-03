@@ -10,6 +10,7 @@
     "@graphql-codegen/client-preset": "^4.8.2",
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-codegen/typescript-operations": "^4.6.1",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.3",
     "esbuild": "^0.25.0"
   },
   "dependencies": {
